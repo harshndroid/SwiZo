@@ -32,13 +32,11 @@ import History from './AfterAuthScreens/History';
 import CustomDrawer from './components/CustomDrawer';
 
 const App= (props)=> {
-    
     const Stack = createStackNavigator();
     const Drawer = createDrawerNavigator();
     const [loading, setLoading] = useState(true);
     const [key, setKey] = useState("");
     const [userDetail, setUserDetail] = useState("");
-    
     useEffect(()=>{
         async function checkUserAuthorization() {
             const value = await AsyncStorage.getItem('@user_key');
@@ -70,10 +68,10 @@ const App= (props)=> {
         .then(res => res.json())
         .then(data => props.saveUserInfo(data[0]))
         .catch(err => {
-            console.log("app.js...",err);  
+            console.log("app.js...",err);
         });
     }, [key]);
-    
+
     useEffect(()=>{
     },[])
     function Loading(){
@@ -83,7 +81,7 @@ const App= (props)=> {
             </View>
         );
     }
-        
+
     function BeforeAuthNavigator(){
         return(
             <Stack.Navigator initialRouteName="Landing">
@@ -92,7 +90,7 @@ const App= (props)=> {
             </Stack.Navigator>
         )
     }
-    
+
     function Home(){
         return(
             <Stack.Navigator initialRouteName={RestaurantList}>
@@ -108,12 +106,12 @@ const App= (props)=> {
         loading ? <Loading /> :
                 <NavigationContainer>
                     {
-                        !props.user.authorized? 
+                        !props.user.authorized?
                             <Stack.Navigator screenOptions={{ headerShown: false }}>
                                 <Stack.Screen name="BeforeAuthNavigator" component={BeforeAuthNavigator} />
                             </Stack.Navigator>
                             :
-                            <Drawer.Navigator 
+                            <Drawer.Navigator
                                 drawerContentOptions = {{labelStyle:{fontFamily: "Montserrat-Medium"}, activeTintColor:"#408ec2", activeBackgroundColor:"transparent"}}
                                 drawerContent={(props) => <CustomDrawer {...props} />}
                             >

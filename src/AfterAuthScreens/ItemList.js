@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { View, ScrollView, Text, TextInput, Image, StyleSheet, StatusBar, Switch, TouchableOpacity } from 'react-native';
 import Ripple from 'react-native-material-ripple';
-import {Card} from 'native-base';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Card } from 'native-base';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import Icon3 from 'react-native-vector-icons/Foundation';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -11,8 +10,9 @@ import Toast from 'react-native-simple-toast';
 import Modal from 'react-native-modal';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-
 import {saveItems, saveCategories} from '../actions/menu';
+import Veg from '../img/veg.svg';
+import NonVeg from '../img/non-veg.svg';
 
 class ItemList extends Component {
     constructor(props){
@@ -30,12 +30,12 @@ class ItemList extends Component {
         }
         this.c = {};
     }
-    
+
     componentDidMount() {
         return this.getItems(this.restaurant_id)
         .then((data) => this.props.saveItems(data));
     }
-    
+
     getItems = (r_id) => {
         return new Promise(function(resolve, reject) {
             fetch('http://192.168.43.192:8080/get_items/',{
@@ -58,29 +58,25 @@ class ItemList extends Component {
                 });
             });
     }
-    
+
     getCategories = () => {
-        if(this.props.menu.categoryList === undefined){
-            fetch('http://192.168.43.192:8080/get_categories/')
-                .then(res => res.json())
-                .then(data => {
-                    this.props.saveCategories(data);
-                })
-                .then(() => this.openModal())
-                .catch(e => console.log("category fetch",e));
-        }
-        else{
-            this.openModal();
-        }
+        this.openModal();
+        fetch('http://192.168.43.192:8080/get_categories/')
+            .then(res => res.json())
+            .then(data => {
+                this.props.saveCategories(data);
+            })
+            .then(() => this.openModal())
+            .catch(e => console.log("category fetch",e));
     }
-    
+
     openModal(){
         this.setState({isVisible: true});
     }
     closeModal(){
         this.setState({isVisible: false});
     }
-    
+
     addToCart(item_id){
         this.c[item_id] = 1;
         this.setState({cart: this.c});
@@ -108,7 +104,7 @@ class ItemList extends Component {
             }
         });
     }
-    
+
     displayByCategory(cat_id){
         if(cat_id !== ""){
             this.setState({ catItems: [] });
@@ -146,9 +142,9 @@ class ItemList extends Component {
     }
     render(){
         let {menu} = this.props;
-        const Skeleton = () => {
+        const ItemSkeleton = () => {
             return(
-                [0].map((i)=><View key={i} style={{marginTop: 20, marginLeft: 15}}>
+                [0,1,2].map((i)=><View key={i} style={{marginTop: 20, marginLeft: 15}}>
                     <SkeletonPlaceholder>
                         <SkeletonPlaceholder.Item width={20} height={20} borderRadius={10} />
                         <SkeletonPlaceholder.Item>
@@ -159,16 +155,27 @@ class ItemList extends Component {
                 </View>)
             )
         }
+        const CategorySkeleton = () => {
+            return(
+                [0,1,2,3,4,5].map((i)=><View key={i} style={{marginTop: 20}}>
+                    <SkeletonPlaceholder>
+                        <SkeletonPlaceholder.Item>
+                            <View><SkeletonPlaceholder.Item width={100} height={15} /></View>
+                        </SkeletonPlaceholder.Item>
+                    </SkeletonPlaceholder>
+                </View>)
+            )
+        }
         const RenderItems = (prop) => {
             let {item, i} = prop;
             return(
-                <View style={{marginLeft:15}}>
+                <View style={{marginHorizontal:15}}>
                     <View style={{justifyContent: "space-between", alignItems: "center", flexDirection: "row", marginTop: 20}}>
                         <View style={{flex:1}}>
                             {item.veg == 1 ?
-                                <Icon name='radio-button-checked' color="green" size={20}></Icon>
+                                <Veg height={20} width={20}/>
                                 :
-                                <Icon name='radio-button-checked' color="#ab1b1b" size={20}></Icon>
+                                <NonVeg height={20} width={20}/>
                             }
                             <View style={{paddingVertical:10}}>
                                 <Text style={{fontSize: 17, fontFamily: "Montserrat-SemiBold"}}>{item.item_name}</Text>
@@ -244,7 +251,7 @@ class ItemList extends Component {
                     { i == vegItems.length-1 ? <View style={{backgroundColor:"white",height: 80, width:vw(100) }}/> : null}
                 </View>
             )
-            
+
         }
         return (
             <>
@@ -259,10 +266,9 @@ class ItemList extends Component {
                     onBackButtonPress={()=>this.closeModal()}
                 >
                     <View>
-                        <View>
-                            {
-                                Object.keys(menu).length === 2 ? 
-                                <>
+                        {
+                            Object.keys(menu).length === 2 ?
+                            <>
                                 <TouchableOpacity onPress={()=>this.displayByCategory("")}>
                                     <Text style={{color:"black",fontSize: 17,padding:5, fontFamily:"Montserrat-SemiBold"}}>Show All Items</Text>
                                 </TouchableOpacity>
@@ -273,14 +279,13 @@ class ItemList extends Component {
                                         </TouchableOpacity>
                                     )
                                 }
-                                </>
-                                :
-                                <View/>
-                            }
-                        </View>
+                            </>
+                            :
+                            <CategorySkeleton />
+                        }
                     </View>
                 </Modal>
-                
+
                 <View style={{flex:1, backgroundColor: "#fff"}}>
                     <View style={{flexDirection:"row", marginTop: 40, marginHorizontal: 15, alignItems:"center", justifyContent:"space-between"}}>
                         <Text style={{fontSize: 14, color:"grey", fontFamily: "Montserrat-Regular"}}>Cart Amount: Rs. {this.state.cartPrice}</Text>
@@ -290,14 +295,14 @@ class ItemList extends Component {
                     </View>
                     <View style={{marginTop: 10, borderColor:"grey", marginHorizontal: 15, borderWidth: 0.3}}/>
                     <View style={{flexDirection:"row", marginTop:10, marginBottom:20, justifyContent:"space-between", alignItems:"center"}}>
-                        
+
                         {
-                            this.state.catItems.length !== 0 ? 
+                            this.state.catItems.length !== 0 ?
                             <Text style={{marginLeft:15, fontFamily: "Montserrat-Medium"}}>{this.state.catTitle}</Text>
-                            : 
+                            :
                             <Text style={{marginLeft:15, fontFamily: "Montserrat-Medium"}}>All Items</Text>
                         }
-                        
+
                         <View style={{flexDirection:"row", alignItems:"center"}}>
                             <Text style={{fontSize:13, fontFamily: "Montserrat-Medium"}}>Veg Only</Text>
                             <Switch
@@ -310,7 +315,7 @@ class ItemList extends Component {
                     </View>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {
-                            Object.keys(menu).length === 0 ? <Skeleton/>
+                            Object.keys(menu).length === 0 ? <ItemSkeleton/>
                             :
                             this.state.catItems.length !== 0 ?
                                 <DisplayCategoryItems />

@@ -12,7 +12,7 @@ import {bindActionCreators} from 'redux';
 
 import { saveUserInfo, userAuthorized } from '../actions/user';
 
-const CarouselItems = [  
+const CarouselItems = [
     {
         title: 'Food delivered at your doorstep',
         uri: require('../img/bike_anim.gif'),
@@ -38,7 +38,7 @@ class Landing extends Component {
             address: "",
         }
     }
-    
+
     saveUser = () => {
         fetch('http://192.168.43.192:8080/login/', {
             method: 'POST',
@@ -55,13 +55,13 @@ class Landing extends Component {
         .then(res=>res.json())
         .then(data=>{
             this.props.saveUserInfo(data[0]);
-            this.closeModal();
+            // this.closeModal();
             this.storeData(this.state.phone);
             this.props.userAuthorized(true);
         })
         .catch(e=>console.log("landing.js",e))
     }
-    
+
     storeData = async (value) => {
       try {
         await AsyncStorage.setItem('@user_key', value);
@@ -69,7 +69,7 @@ class Landing extends Component {
           console.log(e);
       }
     }
-    
+
     get pagination () {
           const { activeDot } = this.state;
           return (
@@ -91,7 +91,7 @@ class Landing extends Component {
               </View>
           );
       }
-  
+
     _renderItem({item,index}){
         return(
             <View key={index} style={{alignItems:"center"}}>
@@ -166,7 +166,7 @@ class Landing extends Component {
                         </View>
                     </View>
                   </Modal>
-                  <View style={{flex:1}}>    
+                  <View style={{flex:1}}>
                       <View style={{alignItems: "center", flex:3, paddingTop: 20}}>
                           <Carousel
                               ref={ref => this.carousel = ref}
