@@ -1,10 +1,13 @@
 var express = require('express');
+var passport = require('passport');
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
 var app = express();
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({type: 'application/json'}));
 app.use(bodyParser.urlencoded({extended: true}));
 
+// clientId: 58104468056-qd9kkj04fv1125i2huas3tg14b8os1bf.apps.googleusercontent.com
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -18,11 +21,9 @@ con.connect(function(err) {
     }
     console.log('Connected to the MySQL server.');
 });
-
-var server = app.listen(8080, ()=>{
-    var host = server.address().address;
-    var port = server.address().port;
-    console.log("server running at 8080")
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log("server running on ", PORT)
 });
 
 app.get('/', function (req, res) {
